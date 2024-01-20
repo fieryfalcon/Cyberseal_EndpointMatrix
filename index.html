@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Network Information</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+      }
+      .info-block {
+        margin-bottom: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Network Information</h1>
+
+    <div class="info-block">
+      <h2>Network Stats</h2>
+      <pre id="network-stats"></pre>
+    </div>
+
+    <div class="info-block">
+      <h2>Jitter</h2>
+      <pre id="jitter"></pre>
+    </div>
+
+    <div class="info-block">
+      <h2>Latency</h2>
+      <pre id="latency"></pre>
+    </div>
+
+    <div class="info-block">
+      <h2>Packet Loss</h2>
+      <pre id="packet-loss"></pre>
+    </div>
+    <div class="info-block">
+      <h2>Wi-Fi Signal Strength</h2>
+      <pre id="wifi-signal-strength"></pre>
+    </div>
+
+    <!-- Script for Network Stats, Jitter, and Latency -->
+    <script>
+      const { ipcRenderer } = require("electron");
+
+      ipcRenderer.on("network-data", (event, data) => {
+        document.getElementById("network-stats").textContent = JSON.stringify(
+          data.networkStats,
+          null,
+          2
+        );
+      });
+
+      ipcRenderer.on("jitter-latency-data", (event, data) => {
+        document.getElementById(
+          "jitter"
+        ).textContent = `Jitter: ${data.jitter} ms`;
+        document.getElementById(
+          "latency"
+        ).textContent = `Latency: ${data.latency} ms`;
+      });
+
+      ipcRenderer.on("packet-loss-data", (event, packetLoss) => {
+        document.getElementById(
+          "packet-loss"
+        ).textContent = `Packet Loss: ${packetLoss}%`;
+      });
+
+      ipcRenderer.on("wifi-signal-strength-data", (event, signalStrength) => {
+        document.getElementById(
+          "wifi-signal-strength"
+        ).textContent = `Wi-Fi Signal Strength: ${signalStrength}`;
+      });
+    </script>
+  </body>
+</html>
