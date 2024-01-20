@@ -38,6 +38,15 @@
       <h2>Wi-Fi Signal Strength</h2>
       <pre id="wifi-signal-strength"></pre>
     </div>
+    <div class="info-block">
+      <h2>Bandwidth</h2>
+      <pre id="bandwidth"></pre>
+    </div>
+
+    <div class="info-block">
+      <h2>CPU Utilization Change</h2>
+      <pre id="cpu-utilization"></pre>
+    </div>
 
     <!-- Script for Network Stats, Jitter, and Latency -->
     <script>
@@ -70,6 +79,21 @@
         document.getElementById(
           "wifi-signal-strength"
         ).textContent = `Wi-Fi Signal Strength: ${signalStrength}`;
+      });
+
+      ipcRenderer.on("bandwidth-data", (event, data) => {
+        document.getElementById(
+          "bandwidth"
+        ).textContent = `Download: ${data.download.toFixed(
+          2
+        )} Mbps\nUpload: ${data.upload.toFixed(2)} Mbps`;
+      });
+
+      ipcRenderer.on("system-info-data", (event, data) => {
+        document.getElementById(
+          "cpu-utilization"
+        ).textContent = `CPU Utilization: ${data.cpuUtilization}%`;
+        // Update other elements with system information
       });
     </script>
   </body>

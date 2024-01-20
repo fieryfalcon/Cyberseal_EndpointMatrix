@@ -3,6 +3,24 @@ const si = require("systeminformation");
 const os = require("os");
 const ping = require("ping");
 const { exec } = require("child_process");
+const FastSpeedtest = require("fast-speedtest-api");
+require("dotenv").config();
+const apiKey = process.env.BANDWIDTH_CALCULATION_API_KEY;
+
+async function calculateBandwidth() {
+  try {
+    const speedtest = new FastSpeedtest({
+      token: apiKey, // Get an API token from https://fast.com/api/
+    });
+    console.log("working on it !");
+    const downloadSpeed = await speedtest.getSpeed();
+    console.log(downloadSpeed);
+    return { download: downloadSpeed / 100000, upload: 0 }; // fast-speedtest-api only measures download speed
+  } catch (error) {
+    console.error("Error measuring bandwidth:", error);
+    return { download: 0, upload: 0 };
+  }
+}
 
 function createWindow() {
   let win = new BrowserWindow({
@@ -17,6 +35,7 @@ function createWindow() {
   win.loadFile("index.html");
 
   monitorNetwork(win);
+  monitorCpuUtilization(win);
 }
 
 async function calculatePacketLoss() {
@@ -32,6 +51,18 @@ async function calculatePacketLoss() {
   const packetLossPercent = (lostPackets / numPings) * 100;
   return packetLossPercent;
 }
+
+// async function calculateBandwidth() {
+//   try {
+//     const result = await speedTest({ acceptLicense: true });
+//     const downloadSpeed = result.download.bandwidth / 1024 / 1024; // Convert to Mbps
+//     const uploadSpeed = result.upload.bandwidth / 1024 / 1024; // Convert to Mbps
+//     return { download: downloadSpeed, upload: uploadSpeed };
+//   } catch (error) {
+//     console.error("Error measuring bandwidth:", error);
+//     return { download: 0, upload: 0 };
+//   }
+// }
 
 async function calculateJitterAndLatency() {
   let previousPing = 0;
@@ -142,6 +173,15 @@ async function monitorNetwork(win) {
       win.webContents.send("jitter-latency-data", { jitter, latency });
     } catch (error) {
       console.error("Error calculating jitter and latency:", error);
+    }
+  }, 10000);
+
+  setInterval(async () => {
+    try {
+      const bandwidth = await calculateBandwidth();
+      win.webContents.send("bandwidth-data", bandwidth);
+    } catch (error) {
+      console.error("Error measuring bandwidth:", error);
     }
   }, 10000);
 
