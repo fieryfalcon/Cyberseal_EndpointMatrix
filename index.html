@@ -42,10 +42,11 @@
       <h2>Bandwidth</h2>
       <pre id="bandwidth"></pre>
     </div>
-
     <div class="info-block">
-      <h2>CPU Utilization Change</h2>
-      <pre id="cpu-utilization"></pre>
+      <h2>Audio Devices</h2>
+      <pre id="audio-devices">Loading...</pre>
+      <h2>Video Devices</h2>
+      <pre id="video-devices">Loading...</pre>
     </div>
 
     <!-- Script for Network Stats, Jitter, and Latency -->
@@ -89,11 +90,11 @@
         )} Mbps\nUpload: ${data.upload.toFixed(2)} Mbps`;
       });
 
-      ipcRenderer.on("system-info-data", (event, data) => {
-        document.getElementById(
-          "cpu-utilization"
-        ).textContent = `CPU Utilization: ${data.cpuUtilization}%`;
-        // Update other elements with system information
+      ipcRenderer.on("audio-video-devices-data", (event, data) => {
+        document.getElementById("audio-devices").textContent =
+          data.audioDevices;
+        document.getElementById("video-devices").textContent =
+          data.videoDevices;
       });
     </script>
   </body>

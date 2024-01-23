@@ -4,8 +4,47 @@ const os = require("os");
 const ping = require("ping");
 const { exec } = require("child_process");
 const FastSpeedtest = require("fast-speedtest-api");
+const snmp = require("net-snmp"); // Add this line to import the snmp module
 require("dotenv").config();
+const { desktopCapturer } = require("electron");
 const apiKey = process.env.BANDWIDTH_CALCULATION_API_KEY;
+const AutoLaunch = require("auto-launch");
+
+const appLauncher = new AutoLaunch({
+  name: "YourAppName",
+  path: app.getPath("exe"),
+});
+
+appLauncher
+  .isEnabled()
+  .then((isEnabled) => {
+    if (!isEnabled) appLauncher.enable();
+  })
+  .catch((error) => {
+    console.error("AutoLauncher error:", error);
+  });
+
+async function getAudioVideoDevices() {
+  try {
+    const sources = await desktopCapturer.getSources({
+      types: ["window", "screen"],
+    });
+    const audioDevices = sources.filter((source) =>
+      source.name.includes("audio")
+    );
+    const videoDevices = sources.filter((source) =>
+      source.name.includes("video")
+    );
+
+    return {
+      audioDevices: audioDevices.map((device) => device.name),
+      videoDevices: videoDevices.map((device) => device.name),
+    };
+  } catch (error) {
+    console.error("Error fetching audio/video devices:", error);
+    return { audioDevices: [], videoDevices: [] };
+  }
+}
 
 async function calculateBandwidth() {
   try {
@@ -33,9 +72,7 @@ function createWindow() {
   });
 
   win.loadFile("index.html");
-
   monitorNetwork(win);
-  monitorCpuUtilization(win);
 }
 
 async function calculatePacketLoss() {
@@ -191,6 +228,16 @@ async function monitorNetwork(win) {
       win.webContents.send("wifi-signal-strength-data", wifiSignalStrength);
     } catch (error) {
       console.error("Error fetching Wi-Fi signal strength:", error);
+    }
+  }, 10000);
+
+  setInterval(async () => {
+    try {
+      const devices = await getAudioVideoDevices();
+      win.webContents.send("audio-video-devices-data", devices);
+      console.log(devices);
+    } catch (error) {
+      console.error("Error fetching audio/video devices:", error);
     }
   }, 10000);
 }
