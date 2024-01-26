@@ -1,101 +1,158 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Network Information</title>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        margin: 20px;
-      }
-      .info-block {
-        margin-bottom: 20px;
-      }
-    </style>
-  </head>
-  <body>
-    <h1>Network Information</h1>
 
-    <div class="info-block">
-      <h2>Network Stats</h2>
-      <pre id="network-stats"></pre>
-    </div>
+<head>
+  <title>Network Information</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
 
-    <div class="info-block">
-      <h2>Jitter</h2>
-      <pre id="jitter"></pre>
-    </div>
+    .info-block {
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
 
-    <div class="info-block">
-      <h2>Latency</h2>
-      <pre id="latency"></pre>
-    </div>
+<body>
+  <h1>Network Information</h1>
 
-    <div class="info-block">
-      <h2>Packet Loss</h2>
-      <pre id="packet-loss"></pre>
-    </div>
-    <div class="info-block">
-      <h2>Wi-Fi Signal Strength</h2>
-      <pre id="wifi-signal-strength"></pre>
-    </div>
-    <div class="info-block">
-      <h2>Bandwidth</h2>
-      <pre id="bandwidth"></pre>
-    </div>
-    <div class="info-block">
-      <h2>Audio Devices</h2>
-      <pre id="audio-devices">Loading...</pre>
-      <h2>Video Devices</h2>
-      <pre id="video-devices">Loading...</pre>
-    </div>
+  <div class="info-block">
+    <h2>Network Stats</h2>
+    <pre id="network-stats"></pre>
+  </div>
 
-    <!-- Script for Network Stats, Jitter, and Latency -->
-    <script>
-      const { ipcRenderer } = require("electron");
+  <div class="info-block">
+    <h2>Jitter</h2>
+    <pre id="jitter"></pre>
+  </div>
 
-      ipcRenderer.on("network-data", (event, data) => {
-        document.getElementById("network-stats").textContent = JSON.stringify(
-          data.networkStats,
-          null,
-          2
-        );
-      });
+  <div class="info-block">
+    <h2>Latency</h2>
+    <pre id="latency"></pre>
+  </div>
 
-      ipcRenderer.on("jitter-latency-data", (event, data) => {
-        document.getElementById(
-          "jitter"
-        ).textContent = `Jitter: ${data.jitter} ms`;
-        document.getElementById(
-          "latency"
-        ).textContent = `Latency: ${data.latency} ms`;
-      });
+  <div class="info-block">
+    <h2>Packet Loss</h2>
+    <pre id="packet-loss"></pre>
+  </div>
+  <div class="info-block">
+    <h2>Wi-Fi Signal Strength</h2>
+    <pre id="wifi-signal-strength"></pre>
+  </div>
+  <div class="info-block">
+    <h2>Bandwidth</h2>
+    <pre id="bandwidth"></pre>
+  </div>
+  <div class="info-block">
+    <h2>Audio Devices</h2>
+    <pre id="audio-devices">Loading...</pre>
+    <h2>Video Devices</h2>
+    <pre id="video-devices">Loading...</pre>
+  </div>
+  <div class="info-block">
+    <h2>RAM</h2>
+    <pre id="ram">Loading...</pre>
+    <pre id="free">Free:  </pre>
+    <pre id="used">Used: </pre>
+    <pre id="act">Active: </pre>
+    <pre id="avb">Available: </pre>
+    <pre id="buffers">Buffers: </pre>
+    <pre id="cached">Cached: </pre>
+    <pre id="slab">Slab: </pre>
+    <pre id="sTotal">Swap Total: </pre>
+    <pre id="sUsed">Swap Used: </pre>
+    <pre id="sFree">Swap Free: </pre>
+  </div>
 
-      ipcRenderer.on("packet-loss-data", (event, packetLoss) => {
-        document.getElementById(
-          "packet-loss"
-        ).textContent = `Packet Loss: ${packetLoss}%`;
-      });
+  <div class="info-block">
+    <h2>Usb Devices Info</h2>
+    <ul id="usb-info">
 
-      ipcRenderer.on("wifi-signal-strength-data", (event, signalStrength) => {
-        document.getElementById(
-          "wifi-signal-strength"
-        ).textContent = `Wi-Fi Signal Strength: ${signalStrength}`;
-      });
+    </ul>
+  </div>
 
-      ipcRenderer.on("bandwidth-data", (event, data) => {
-        document.getElementById(
-          "bandwidth"
-        ).textContent = `Download: ${data.download.toFixed(
-          2
-        )} Mbps\nUpload: ${data.upload.toFixed(2)} Mbps`;
-      });
+  <!-- Script for Network Stats, Jitter, and Latency -->
+  <script>
+    const { ipcRenderer } = require("electron");
 
-      ipcRenderer.on("audio-video-devices-data", (event, data) => {
-        document.getElementById("audio-devices").textContent =
-          data.audioDevices;
-        document.getElementById("video-devices").textContent =
-          data.videoDevices;
-      });
-    </script>
-  </body>
+    ipcRenderer.on("network-data", (event, data) => {
+      document.getElementById("network-stats").textContent = JSON.stringify(
+        data.networkStats,
+        null,
+        2
+      );
+    });
+
+    ipcRenderer.on("jitter-latency-data", (event, data) => {
+      document.getElementById(
+        "jitter"
+      ).textContent = `Jitter: ${data.jitter} ms`;
+      document.getElementById(
+        "latency"
+      ).textContent = `Latency: ${data.latency} ms`;
+    });
+
+    ipcRenderer.on("packet-loss-data", (event, packetLoss) => {
+      document.getElementById(
+        "packet-loss"
+      ).textContent = `Packet Loss: ${packetLoss}%`;
+    });
+
+    ipcRenderer.on("wifi-signal-strength-data", (event, signalStrength) => {
+      document.getElementById(
+        "wifi-signal-strength"
+      ).textContent = `Wi-Fi Signal Strength: ${signalStrength}`;
+    });
+
+    ipcRenderer.on("bandwidth-data", (event, data) => {
+      document.getElementById(
+        "bandwidth"
+      ).textContent = `Download: ${data.download.toFixed(
+        2
+      )} Mbps\nUpload: ${data.upload.toFixed(2)} Mbps`;
+    });
+
+    ipcRenderer.on("audio-video-devices-data", (event, data) => {
+      document.getElementById("audio-devices").textContent =
+        data.audioDevices;
+      document.getElementById("video-devices").textContent =
+        data.videoDevices;
+    });
+
+    ipcRenderer.on("ram-data", (event, data) => {
+      document.getElementById("ram").innerText = "Total: " + data.ramData.total / 1000000 + 'MB'
+      document.getElementById("free").textContent = "Free: " + data.ramData.free / 1000000 + 'MB'
+      document.getElementById("used").textContent = "Used: " + data.ramData.used / 1000000 + 'MB'
+      document.getElementById("act").textContent = "Active: " + data.ramData.active / 1000000 + 'MB'
+      document.getElementById("avb").textContent = "Available: " + data.ramData.available / 1000000 + 'MB'
+      document.getElementById("buffers").textContent = "Buffers: " + data.ramData.buffers / 1000000 + 'MB'
+      document.getElementById("cached").textContent = "Cached: " + data.ramData.cached / 1000000 + 'MB'
+      document.getElementById("slab").textContent = "Slab: " + data.ramData.slab
+      document.getElementById("sTotal").textContent = "Swap Total: " + data.ramData.swaptotal / 1000000 + 'MB'
+      document.getElementById("sUsed").textContent = "Swap Used: " + data.ramData.swapused / 1000000 + 'MB'
+      document.getElementById("sFree").textContent = "Swap Free: " + data.ramData.swapfree / 1000000 + 'MB'
+    })
+
+    ipcRenderer.on("usb-info", (e, data) => {
+    console.log(data.usbDevicesInfo.length, "data");
+    document.getElementById('usb-info').textContent = data;
+    
+    function UsbData() {
+        for (let index = 0; index < data.usbDevicesInfo.length; index++) {
+            var element = document.createElement('LI');
+            // element.type = "div";
+            element.innerText = data?.usbDevicesInfo[index].name;
+            document.getElementById('usb-info').appendChild(element);
+            console.log(document.getElementById('usb-info'), "element");
+        }
+    }
+    UsbData();
+})
+      
+
+  </script>
+</body>
+
 </html>

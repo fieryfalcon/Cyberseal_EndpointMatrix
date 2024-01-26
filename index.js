@@ -3,7 +3,7 @@ const si = require("systeminformation");
 const os = require("os");
 const ping = require("ping");
 const { exec } = require("child_process");
-const FastSpeedtest = require("fast-speedtest-api");
+// const FastSpeedtest = require("fast-speedtest-api");
 const snmp = require("net-snmp"); // Add this line to import the snmp module
 require("dotenv").config();
 const { desktopCapturer } = require("electron");
@@ -46,20 +46,20 @@ async function getAudioVideoDevices() {
   }
 }
 
-async function calculateBandwidth() {
-  try {
-    const speedtest = new FastSpeedtest({
-      token: apiKey, // Get an API token from https://fast.com/api/
-    });
-    console.log("working on it !");
-    const downloadSpeed = await speedtest.getSpeed();
-    console.log(downloadSpeed);
-    return { download: downloadSpeed / 100000, upload: 0 }; // fast-speedtest-api only measures download speed
-  } catch (error) {
-    console.error("Error measuring bandwidth:", error);
-    return { download: 0, upload: 0 };
-  }
-}
+// async function calculateBandwidth() {
+//   try {
+//     const speedtest = new FastSpeedtest({
+//       token: apiKey, // Get an API token from https://fast.com/api/
+//     });
+//     console.log("working on it !");
+//     const downloadSpeed = await speedtest.getSpeed();
+//     console.log(downloadSpeed);
+//     return { download: downloadSpeed / 100000, upload: 0 }; // fast-speedtest-api only measures download speed
+//   } catch (error) {
+//     console.error("Error measuring bandwidth:", error);
+//     return { download: 0, upload: 0 };
+//   }
+// }
 
 function createWindow() {
   let win = new BrowserWindow({
@@ -213,14 +213,14 @@ async function monitorNetwork(win) {
     }
   }, 10000);
 
-  setInterval(async () => {
-    try {
-      const bandwidth = await calculateBandwidth();
-      win.webContents.send("bandwidth-data", bandwidth);
-    } catch (error) {
-      console.error("Error measuring bandwidth:", error);
-    }
-  }, 10000);
+  // setInterval(async () => {
+  //   try {
+  //     const bandwidth = await calculateBandwidth();
+  //     win.webContents.send("bandwidth-data", bandwidth);
+  //   } catch (error) {
+  //     console.error("Error measuring bandwidth:", error);
+  //   }
+  // }, 10000);
 
   setInterval(async () => {
     try {
@@ -240,6 +240,24 @@ async function monitorNetwork(win) {
       console.error("Error fetching audio/video devices:", error);
     }
   }, 10000);
+
+  setInterval(async () => {
+    try {
+      const ramData = await si.mem();
+      win.webContents.send("ram-data", {ramData})
+  } catch (error) {
+      console.log("Error in fetching RAM Data" ,error);
+  }
+  }, 10000);
+
+  setTimeout(async() => {
+    try {
+      const usbDevicesInfo = await si.usb();
+      win.webContents.send("usb-info", {usbDevicesInfo})
+  } catch (error) {
+      console.log("error in si",error);
+  }
+  }, 500);
 }
 
 app.whenReady().then(createWindow);

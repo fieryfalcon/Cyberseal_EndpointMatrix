@@ -11,7 +11,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "auto-launch": "^5.0.6",
+    "dotenv": "^16.4.1",
     "electron": "^28.1.4",
+    "net-snmp": "^3.10.0",
     "ping": "^0.4.4",
     "systeminformation": "^5.21.22"
   },
